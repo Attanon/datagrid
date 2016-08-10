@@ -13,6 +13,7 @@ use DibiFluent;
 use DibiOdbcDriver;
 use DibiMsSqlDriver;
 use Nette\Database\Table\Selection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\QueryBuilder;
 use Ublaboo\DataGrid\DataSource\IDataSource;
 use Ublaboo\DataGrid\Exception\DataGridWrongDataSourceException;
@@ -20,6 +21,7 @@ use Ublaboo\DataGrid\Utils\Sorting;
 use Ublaboo\DataGrid\Utils\NetteDatabaseSelectionHelper;
 use Nette\Database\Drivers as NDBDrivers;
 use Ublaboo\DataGrid\DataSource\ApiDataSource;
+use Nextras\Orm\Collection\ICollection;
 
 class DataModel
 {
@@ -31,7 +33,7 @@ class DataModel
 
 
 	/**
-	 * @param IDataSource|array|DibiFluent|Selection|QueryBuilder $source
+	 * @param IDataSource|array|DibiFluent|Selection|QueryBuilder|Collection $source
 	 * @param string $primary_key
 	 */
 	public function __construct($source, $primary_key)
@@ -70,6 +72,12 @@ class DataModel
 
 		} else if (class_exists('Doctrine\ORM\QueryBuilder') && $source instanceof QueryBuilder) {
 			$source = new DataSource\DoctrineDataSource($source, $primary_key);
+
+		} else if (interface_exists('Doctrine\Common\Collections\Collection') && $source instanceof Collection) {
+			$source = new DataSource\DoctrineCollectionDataSource($source, $primary_key);
+
+		} elseif (interface_exists('Nextras\Orm\Collection\ICollection') && $source instanceof ICollection) {
+			$source = new DataSource\NextrasDataSource($source, $primary_key);
 
 		} else {
 			throw new DataGridWrongDataSourceException(sprintf(

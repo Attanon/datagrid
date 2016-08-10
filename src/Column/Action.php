@@ -19,27 +19,13 @@ use Ublaboo\DataGrid\Traits;
 class Action extends Column
 {
 
-	use Traits\ButtonIconTrait;
+	use Traits\TButton;
+	use Traits\TLink;
 
 	/**
 	 * @var string
 	 */
 	public static $data_confirm_attribute_name = 'datagrid-confirm';
-
-	/**
-	 * @var string|callable
-	 */
-	protected $title;
-
-	/**
-	 * @var string|callable
-	 */
-	protected $class;
-
-	/**
-	 * @var string|callable
-	 */
-	protected $icon;
 
 	/**
 	 * @var DataGrid
@@ -71,6 +57,11 @@ class Action extends Column
 	 */
 	protected $data_attributes = [];
 
+	/**
+	 * @var array
+	 */
+	protected $attributes = [];
+
 
 	/**
 	 * @param DataGrid $grid
@@ -84,8 +75,6 @@ class Action extends Column
 		$this->href = $href;
 		$this->name = $name;
 		$this->params = $params;
-
-		$this->class = 'btn btn-xs btn-default';
 	}
 
 
@@ -107,7 +96,11 @@ class Action extends Column
 			 */
 		}
 
-		$link = $this->createLink($this->href, $this->getItemParams($row, $this->params));
+		$link = $this->createLink(
+			$this->grid,
+			$this->href,
+			$this->getItemParams($row, $this->params)
+		);
 
 		$a = Html::el('a')->href($link);
 
@@ -119,7 +112,11 @@ class Action extends Column
 			}
 		}
 
-		$a->add($this->translate($this->getName()));
+		if (!empty($this->attributes)) {
+			$a->addAttributes($this->attributes);
+		}
+
+		$a->addText($this->translate($this->getName()));
 
 		if ($this->title) {
 			$a->title($this->translate($this->getTitle($row)));
@@ -288,6 +285,19 @@ class Action extends Column
 	{
 		$this->data_attributes[$key] = $value;
 		
+		return $this;
+	}
+
+
+	/**
+	 * Set attributes for a element
+	 * @param array $attrs
+	 * @return static
+	 */
+	public function addAttributes(array $attrs)
+	{
+		$this->attributes = $this->attributes + $attrs;
+
 		return $this;
 	}
 

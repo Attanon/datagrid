@@ -23,12 +23,17 @@ class FilterText extends Filter
 	 */
 	protected $type = 'text';
 
+	/**
+	 * @var bool
+	 */
+	protected $split_words_search = TRUE;
+
 
 	/**
 	 * Adds text field to filter form
 	 * @param Nette\Forms\Container $container
 	 */
-	public function addToFormContainer($container)
+	public function addToFormContainer(Nette\Forms\Container $container)
 	{
 		$container->addText($this->key, $this->name);
 
@@ -50,6 +55,27 @@ class FilterText extends Filter
 	public function getCondition()
 	{
 		return array_fill_keys($this->column, $this->getValue());
+	}
+
+
+	/**
+	 * @param bool $split_words_search
+	 * @return FilterText
+	 */
+	public function setSplitWordsSearch($split_words_search)
+	{
+		$this->split_words_search = (bool) $split_words_search;
+
+		return $this;
+	}
+
+
+	/**
+	 * @return bool
+	 */
+	public function hasSplitWordsSearch()
+	{
+		return $this->split_words_search;
 	}
 
 }

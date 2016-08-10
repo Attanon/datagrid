@@ -47,6 +47,11 @@ class ColumnLink extends Column
 	 */
 	protected $data_attributes = [];
 
+	/**
+	 * @var bool
+	 */
+	protected $open_in_new_tab = FALSE;
+
 
 	/**
 	 * @param DataGrid $grid
@@ -90,12 +95,20 @@ class ColumnLink extends Column
 		}
 
 		$a = Html::el('a')
-			->href($this->createLink($this->href, $this->getItemParams($row, $this->params)));
+			->href($this->createLink(
+				$this->grid,
+				$this->href,
+				$this->getItemParams($row, $this->params)
+			));
 			
 		if (!empty($this->data_attributes)) {
 			foreach ($this->data_attributes as $key => $attr_value) {
 				$a->data($key, $attr_value);
 			}
+		}
+
+		if ($this->open_in_new_tab) {
+			$a->addAttributes(['target' => '_blank']);
 		}
 
 		if ($this->title) { $a->title($this->title); }
@@ -104,17 +117,17 @@ class ColumnLink extends Column
 		$element = $a;
 
 		if ($this->icon) {
-			$a->add(Html::el('span')->class(DataGrid::$icon_prefix . $this->icon));
+			$a->addHtml(Html::el('span')->class(DataGrid::$icon_prefix . $this->icon));
 
 			if (strlen($value)) {
-				$a->add('&nbsp;');
+				$a->addHtml('&nbsp;');
 			}
 		}
 
 		if ($this->isTemplateEscaped()) {
-			$a->add(htmlspecialchars((string) $value, ENT_NOQUOTES, 'UTF-8'));
+			$a->addText($value);
 		} else {
-			$a->add($value);
+			$a->addHtml($value);
 		}
 
 		return $element;
@@ -188,5 +201,26 @@ class ColumnLink extends Column
 	{
 		return $this->class;
 	}
+
+	/**
+	 * Open link in new window/tab?
+	 * @return boolean
+	 */
+	public function isOpenInNewTab()
+	{
+		return $this->open_in_new_tab;
+	}
+
+	/**
+	 * Set link to open in new tab/window or not
+	 * @param boolean $open_in_new_tab
+	 */
+	public function setOpenInNewTab($open_in_new_tab)
+	{
+		$this->open_in_new_tab = $open_in_new_tab;
+	}
+
+
+
 
 }

@@ -13,6 +13,7 @@ use Ublaboo\DataGrid\Filter\FilterDate;
 use Ublaboo\DataGrid\Filter\FilterMultiSelect;
 use Ublaboo\DataGrid\Filter\FilterRange;
 use Ublaboo\DataGrid\Filter\FilterDateRange;
+use Ublaboo\DataGrid\Filter\FilterText;
 use Nette\Utils\Callback;
 use Nette\Utils\Strings;
 use Ublaboo\DataGrid\Exception\DataGridException;
@@ -150,11 +151,16 @@ class ArrayDataSource implements IDataSource
 			$condition = $filter->getCondition();
 
 			foreach ($condition as $column => $value) {
-				$words = explode(' ', $value);
+				if ($filter instanceof FilterText && $filter->hasSplitWordsSearch() === FALSE) {
+					$words = [$value];
+				} else {
+					$words = explode(' ', $value);
+				}
+
 				$row_value = strtolower(Strings::toAscii($row[$column]));
 
 				foreach ($words as $word) {
-					if (FALSE !== strpos($row_value, strtolower(Strings::toAscii($value)))) {
+					if (FALSE !== strpos($row_value, strtolower(Strings::toAscii($word)))) {
 						return $row;
 					}
 				}
